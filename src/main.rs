@@ -14,12 +14,15 @@ fn main() {
     let mut player_pos = Vector3::new(0.0, 0.0, 0.0);
     let player_speed: f32 = 5.0;
 
-    // jump state
     let ground_y: f32 = 0.0;
     let mut velocity_y: f32 = 0.0;
     let gravity: f32 = -25.0;
     let jump_force: f32 = 10.0;
     let mut is_grounded = true;
+
+    const LANE_WIDTH: f32 = 3.0;
+    let mut current_lane: i32 = 0;
+    let lane_snap_speed: f32 = 15.0;
 
     let camera_offset = Vector3::new(0.0, 3.2, -7.0);
 
@@ -43,6 +46,8 @@ fn main() {
         let frame_time = rl.get_frame_time();
 
         let jump_pressed = rl.is_key_pressed(KeyboardKey::KEY_SPACE);
+        let move_left = rl.is_key_pressed(KeyboardKey::KEY_D);
+        let move_right = rl.is_key_pressed(KeyboardKey::KEY_A);
 
         if jump_pressed && is_grounded {
             velocity_y = jump_force;
@@ -58,9 +63,17 @@ fn main() {
             is_grounded = true;
         }
 
+        if move_left && current_lane > -1 {
+            current_lane -= 1;
+        }
+        if move_right && current_lane < 1 {
+            current_lane += 1;
+        }
+        let target_x = current_lane as f32 * LANE_WIDTH;
+        player_pos.x += (target_x - player_pos.x) * (lane_snap_speed * frame_time).min(1.0);
+
         player_pos.z += player_speed * frame_time;
 
-        // --- camera follow ---
         camera.position = Vector3::new(
             player_pos.x + camera_offset.x,
             player_pos.y + camera_offset.y,
