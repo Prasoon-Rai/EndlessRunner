@@ -1,5 +1,4 @@
 mod load_models;
-use raylib::consts::CameraMode::CAMERA_FREE;
 use load_models::load_models;
 use raylib::prelude::*;
 
